@@ -12,14 +12,16 @@ window = window.create(600, 600)
 glfw.set_key_callback(window, key_event.key_event)
 program = program.create()
 
-centers = [None]*5
-max_distances = [None]*5
-n_vertices = [None]*5
+infos = 5*[object.Info()]
 
-centers[0], max_distances[0], n_vertices[0] = object.load(program, 'models/caixa/caixa.obj')
+infos[0] = object.load('models/caixa/caixa.obj')
+infos[0].primitive = 'triangles'
 texture.load(0, 'models/caixa/caixa.jpg')
 
-loc = glGetUniformLocation(program, "mat_transformation")
+infos[1] = object.load('models/bench.obj')
+infos[1].primitive = 'lines'
+
+loc_transformation = glGetUniformLocation(program, "mat_transformation")
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_TEXTURE_2D)
 glfw.show_window(window)
@@ -39,14 +41,14 @@ while not glfw.window_should_close(window):
     texture.set_parameters(key_event.object, key_event.gl_linear)
 
     key_event.check_transforamtion_paramenters()
-    mat_transform = transformation.get_transformation( centers[key_event.object], 
-                                                       max_distances[key_event.object], 
+    mat_transform = transformation.get_transformation( infos[key_event.object].center, 
+                                                       infos[key_event.object].max_distance, 
                                                        key_event.offsets, 
                                                        key_event.scale, 
                                                        key_event.angles)
-    glUniformMatrix4fv(loc, 1, GL_TRUE, mat_transform)
+    glUniformMatrix4fv(loc_transformation, 1, GL_TRUE, mat_transform)
 
-    object.draw(key_event.object, n_vertices, False, 'triangle')   
+    object.draw(program, key_event.object, infos)   
 
     glfw.swap_buffers(window)
 

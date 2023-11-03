@@ -1,6 +1,6 @@
 import glfw
 
-polygonal_mode = False
+polygonal_mode = True
 gl_linear = False
 object = 0
 offsets = [0, 0]
@@ -55,7 +55,7 @@ def key_event(window,key,scancode,action,mods):
     if (key == 53 or key == 101): object = 4; reset = True
 
     if reset:
-        polygonal_mode = False
+        polygonal_mode = True
         gl_linear = False
         offsets = [0, 0]
         scale = 1
