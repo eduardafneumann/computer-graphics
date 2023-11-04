@@ -14,7 +14,6 @@ def get_transformation(center, max_distance, offsets, scale, angles):
                                     [0.0, 0.0, 1.0, -center[2]], 
                                     [0.0, 0.0, 0.0,        1.0]       
                                ], np.float32)
-
     size = 1/max_distance
     mat_fit_screen  = np.array([    [size,    0.0,    0.0, 0.0], 
                                     [   0.0, size,    0.0, 0.0], 

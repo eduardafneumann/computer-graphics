@@ -60,37 +60,24 @@ def get_coords_from_model(model):
 
 def get_info(vertices):
     center = np.array([sum(coord) for coord in zip(*vertices['position'])])/len(vertices)
-    distances = [math.sqrt(v[0]**2 + v[1]**2 + v[2]**2) for v in vertices["position"]]
+    distances = [math.sqrt((v[0] - center[0])**2 + 
+                           (v[1] - center[1])**2 + 
+                           (v[2] - center[2])**2) for v in vertices["position"]]
     max_distance = max(distances)
     n_vertices = len(vertices['position'])
     
     return center, max_distance, n_vertices
 
-def send_texture_coords_to_gpu(coords):
+def send_coords_to_gpu(coords):
     vbo = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
-    glBufferData(GL_ARRAY_BUFFER, coords.nbytes, coords, GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, coords.nbytes, coords, GL_DYNAMIC_DRAW)
 
     stride = coords.strides[0]
     offset = ctypes.c_void_p(0)
+    dimension = len(coords[0][0])
 
-    config = [2, GL_FLOAT, False, stride, offset]
-    
-    # loc = glGetAttribLocation(program, "texture_coord")
-    # glEnableVertexAttribArray(loc)
-    # glVertexAttribPointer(loc, 2, GL_FLOAT, False, stride, offset)
-
-    return vbo, config
-
-def send_vertices_to_gpu(vertices):
-    vbo = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo)
-    glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_DYNAMIC_DRAW)
-
-    stride = vertices.strides[0]
-    offset = ctypes.c_void_p(0)
-
-    config = [3, GL_FLOAT, False, stride, offset]
+    config = [dimension, GL_FLOAT, False, stride, offset]
 
     return vbo, config
 
@@ -110,41 +97,50 @@ def load(object_filename):
     model = load_model_from_file(object_filename)
     vertices, textures = get_coords_from_model(model)
 
-    info.vertice_vbo, info.vertice_config = send_vertices_to_gpu(vertices)
-    info.texture_vbo, info.texture_config = send_texture_coords_to_gpu(textures)
+    info.vertice_vbo, info.vertice_config = send_coords_to_gpu(vertices)
+    info.texture_vbo, info.texture_config = send_coords_to_gpu(textures)
 
     info.center, info.max_distance, info.n_vertices = get_info(vertices)
 
     return info
 
-def draw(program, object, infos):
-    first_vertice = 0
-    for i in range(object):
-        first_vertice += infos[i].n_vertices
+def draw(program, object, info):
 
     glBindTexture(GL_TEXTURE_2D, object)
 
-    glBindBuffer(GL_ARRAY_BUFFER, infos[object].texture_vbo)
+    glBindBuffer(GL_ARRAY_BUFFER, info.texture_vbo)
     loc_texture = glGetAttribLocation(program, "texture_coord")
     glEnableVertexAttribArray(loc_texture)
     glVertexAttribPointer(loc_texture, 
-                          infos[object].texture_config[0], 
-                          infos[object].texture_config[1], 
-                          infos[object].texture_config[2], 
-                          infos[object].texture_config[3], 
-                          infos[object].texture_config[4])
+                          info.texture_config[0], 
+                          info.texture_config[1], 
+                          info.texture_config[2], 
+                          info.texture_config[3], 
+                          info.texture_config[4])
     
-    glBindBuffer(GL_ARRAY_BUFFER, infos[object].vertice_vbo)
+    glBindBuffer(GL_ARRAY_BUFFER, info.vertice_vbo)
     loc_position = glGetAttribLocation(program, "position")
     glEnableVertexAttribArray(loc_position)
     glVertexAttribPointer(loc_position, 
-                          infos[object].vertice_config[0], 
-                          infos[object].vertice_config[1], 
-                          infos[object].vertice_config[2], 
-                          infos[object].vertice_config[3], 
-                          infos[object].vertice_config[4])
-    
-    if infos[object].primitive == 'triangles' :
-        glDrawArrays(GL_TRIANGLES, first_vertice, infos[object].n_vertices)
-    if infos[object].primitive == 'lines' :
-        glDrawArrays(GL_LINES, first_vertice, infos[object].n_vertices)
+                          info.vertice_config[0], 
+                          info.vertice_config[1], 
+                          info.vertice_config[2], 
+                          info.vertice_config[3], 
+                          info.vertice_config[4])
+
+    if info.primitive == 'triangles' :
+        glDrawArrays(GL_TRIANGLES, 0, info.n_vertices)
+    if info.primitive == 'lines' :
+        glDrawArrays(GL_LINES, 0, info.n_vertices)
+    if info.primitive == 'quads' :
+        glDrawArrays(GL_QUADS, 0, info.n_vertices)
+    if info.primitive == 'strip' :
+        # glDrawArrays( GL_LINE_STRIP, 0, info.n_vertices)
+        # glDrawArrays( GL_LINE_LOOP, 0, info.n_vertices)
+        # glDrawArrays( GL_LINE_STRIP_ADJACENCY, 0, info.n_vertices)
+        # glDrawArrays( GL_LINES_ADJACENCY, 0, info.n_vertices)
+
+        # glDrawArrays( GL_TRIANGLE_STRIP, 0, info.n_vertices)
+        # glDrawArrays( GL_TRIANGLE_FAN, 0, info.n_vertices)
+        # glDrawArrays( GL_TRIANGLE_STRIP_ADJACENCY, 0, info.n_vertices)
+        glDrawArrays( GL_TRIANGLES_ADJACENCY, 0, info.n_vertices)

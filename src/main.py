@@ -14,12 +14,28 @@ program = program.create()
 
 infos = 5*[object.Info()]
 
-infos[0] = object.load('models/caixa/caixa.obj')
-infos[0].primitive = 'triangles'
-texture.load(0, 'models/caixa/caixa.jpg')
+infos[0] = object.load('models/tartaruga/tartaruga.obj')
+infos[0].primitive = 'quads'
+texture.load(0, 'models/tartaruga/tartaruga.jpg')
 
-infos[1] = object.load('models/bench.obj')
-infos[1].primitive = 'lines'
+infos[1] = object.load('models/casa/casa.obj')
+infos[1].primitive = 'triangles'
+texture.load(1, 'models/casa/casa.jpg')
+
+infos[2] = object.load('models/planta/planta.obj')
+infos[2].primitive = 'quads'
+texture.load(2, 'models/planta/planta.jpg')
+
+infos[3] = object.load('models/estatua/estatua.obj')
+infos[3].primitive = 'quads'
+texture.load(3, 'models/estatua/estatua.jpg')
+
+infos[4] = object.load('models/touro/touro.obj')
+infos[4].primitive = 'quads'
+texture.load(4, 'models/touro/touro.jpg')
+
+
+print(infos[0].max_distance)
 
 loc_transformation = glGetUniformLocation(program, "mat_transformation")
 glEnable(GL_DEPTH_TEST)
@@ -47,8 +63,8 @@ while not glfw.window_should_close(window):
                                                        key_event.scale, 
                                                        key_event.angles)
     glUniformMatrix4fv(loc_transformation, 1, GL_TRUE, mat_transform)
-
-    object.draw(program, key_event.object, infos)   
+    
+    object.draw(program, key_event.object, infos[key_event.object])   
 
     glfw.swap_buffers(window)
 
