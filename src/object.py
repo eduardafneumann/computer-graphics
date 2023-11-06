@@ -134,9 +134,9 @@ def draw(program, object, info):
 
     if info.primitive == 'triangles' :
         glDrawArrays(GL_TRIANGLES, 0, info.n_vertices)
-    if info.primitive == 'lines' :
+    elif info.primitive == 'lines' :
         glDrawArrays(GL_LINES, 0, info.n_vertices)
-    if info.primitive == 'quads' :
+    elif info.primitive == 'quads' :
         glDrawArrays(GL_QUADS, 0, info.n_vertices)
     else:
         print("Invalid primitive, the object is not being displayed.")
