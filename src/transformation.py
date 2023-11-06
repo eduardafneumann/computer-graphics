@@ -9,11 +9,15 @@ def get_transformation(center, max_distance, offsets, scale, angles):
                                     [0.0, 0.0, 0.0, 1.0]
                               ], np.float32)
 
+      # Center the object in window.
     mat_center      = np.array([    [1.0, 0.0, 0.0, -center[0]], 
                                     [0.0, 1.0, 0.0, -center[1]], 
                                     [0.0, 0.0, 1.0, -center[2]], 
                                     [0.0, 0.0, 0.0,        1.0]       
                                ], np.float32)
+    
+    # Scale the object to the maximum size while it still can be rotated 
+    # in all directions and still fitting the screen.
     size = 1/max_distance
     mat_fit_screen  = np.array([    [size,    0.0,    0.0, 0.0], 
                                     [   0.0, size,    0.0, 0.0], 

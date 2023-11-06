@@ -8,10 +8,12 @@ import object
 import texture 
 import transformation
 
+# Create program, window, and set key event.
 window = window.create(600, 600)
 glfw.set_key_callback(window, key_event.key_event)
 program = program.create()
 
+# Load objects.
 infos = 5*[object.Info()]
 
 infos[0] = object.load('models/tartaruga/tartaruga.obj')
@@ -34,14 +36,13 @@ infos[4] = object.load('models/touro/touro.obj')
 infos[4].primitive = 'quads'
 texture.load(4, 'models/touro/touro.jpg')
 
-
-print(infos[0].max_distance)
-
+# Set up openGL.
 loc_transformation = glGetUniformLocation(program, "mat_transformation")
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_TEXTURE_2D)
 glfw.show_window(window)
 
+# Main loop.
 while not glfw.window_should_close(window):
 
     glfw.poll_events() 
@@ -49,13 +50,16 @@ while not glfw.window_should_close(window):
     glClear(GL_COLOR_BUFFER_BIT) 
     glClearColor(1.0, 1.0, 1.0, 1.0)
 
+    # Activate or deactivate texture.
     if key_event.polygonal_mode==True:
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
     if key_event.polygonal_mode==False:
         glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
 
+    # Set texture filtering method.
     texture.set_parameters(key_event.object, key_event.gl_linear)
 
+    # Adapt transformation to key event.
     key_event.check_transforamtion_paramenters()
     mat_transform = transformation.get_transformation( infos[key_event.object].center, 
                                                        infos[key_event.object].max_distance, 
@@ -64,6 +68,7 @@ while not glfw.window_should_close(window):
                                                        key_event.angles)
     glUniformMatrix4fv(loc_transformation, 1, GL_TRUE, mat_transform)
     
+    # Display current object.
     object.draw(program, key_event.object, infos[key_event.object])   
 
     glfw.swap_buffers(window)

@@ -45,10 +45,9 @@ def create():
             gl_FragColor = texture;
         }
         """
-
+        
     create_shader(program, vertex_code, 'vertex')
     create_shader(program, fragment_code, 'fragment')
-    
     
     glLinkProgram(program)
     if not glGetProgramiv(program, GL_LINK_STATUS):

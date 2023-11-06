@@ -2,6 +2,16 @@ from OpenGL.GL import *
 import numpy as np
 import math
 
+class Info:
+    center = [0, 0, 0]
+    max_distance = 0
+    n_vertices = 0
+    vertice_vbo = 0
+    texture_vbo = 0
+    vertice_config = []
+    texture_config = []
+    primitive = 'triangles'
+    
 def load_model_from_file(filename):
     vertices = []
     texture_coords = []
@@ -63,33 +73,24 @@ def get_info(vertices):
     distances = [math.sqrt((v[0] - center[0])**2 + 
                            (v[1] - center[1])**2 + 
                            (v[2] - center[2])**2) for v in vertices["position"]]
-    max_distance = max(distances)
+    max_distance = max(distances) # Max euclidian distance of vertices to the center.
     n_vertices = len(vertices['position'])
     
     return center, max_distance, n_vertices
 
 def send_coords_to_gpu(coords):
+    # Get a buffer and send coordinates.
     vbo = glGenBuffers(1)
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
     glBufferData(GL_ARRAY_BUFFER, coords.nbytes, coords, GL_DYNAMIC_DRAW)
 
+    # Used to configurate the shader when displaying the object.
     stride = coords.strides[0]
     offset = ctypes.c_void_p(0)
     dimension = len(coords[0][0])
-
     config = [dimension, GL_FLOAT, False, stride, offset]
 
     return vbo, config
-
-class Info:
-    center = [0, 0, 0]
-    max_distance = 0
-    n_vertices = 0
-    vertice_vbo = 0
-    texture_vbo = 0
-    vertice_config = []
-    texture_config = []
-    primitive = 'triangles'
 
 def load(object_filename):
     info = Info()
@@ -106,8 +107,10 @@ def load(object_filename):
 
 def draw(program, object, info):
 
+    # Select texture.
     glBindTexture(GL_TEXTURE_2D, object)
 
+    # Select and configure texture coordinates.
     glBindBuffer(GL_ARRAY_BUFFER, info.texture_vbo)
     loc_texture = glGetAttribLocation(program, "texture_coord")
     glEnableVertexAttribArray(loc_texture)
@@ -118,6 +121,7 @@ def draw(program, object, info):
                           info.texture_config[3], 
                           info.texture_config[4])
     
+    # Select and configure object coordinates.
     glBindBuffer(GL_ARRAY_BUFFER, info.vertice_vbo)
     loc_position = glGetAttribLocation(program, "position")
     glEnableVertexAttribArray(loc_position)
@@ -134,13 +138,5 @@ def draw(program, object, info):
         glDrawArrays(GL_LINES, 0, info.n_vertices)
     if info.primitive == 'quads' :
         glDrawArrays(GL_QUADS, 0, info.n_vertices)
-    if info.primitive == 'strip' :
-        # glDrawArrays( GL_LINE_STRIP, 0, info.n_vertices)
-        # glDrawArrays( GL_LINE_LOOP, 0, info.n_vertices)
-        # glDrawArrays( GL_LINE_STRIP_ADJACENCY, 0, info.n_vertices)
-        # glDrawArrays( GL_LINES_ADJACENCY, 0, info.n_vertices)
-
-        # glDrawArrays( GL_TRIANGLE_STRIP, 0, info.n_vertices)
-        # glDrawArrays( GL_TRIANGLE_FAN, 0, info.n_vertices)
-        # glDrawArrays( GL_TRIANGLE_STRIP_ADJACENCY, 0, info.n_vertices)
-        glDrawArrays( GL_TRIANGLES_ADJACENCY, 0, info.n_vertices)
+    else:
+        print("Invalid primitive, the object is not being displayed.")
