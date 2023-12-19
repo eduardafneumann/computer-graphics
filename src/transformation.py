@@ -1,7 +1,8 @@
 import numpy as np
 import math
+import glm
 
-def get_transformation(center, max_distance, offsets, scale, angles):
+def model(center, max_distance, offsets, scale, angles):
 
     mat_transform  = np.array([     [1.0, 0.0, 0.0, 0.0], 
                                     [0.0, 1.0, 0.0, 0.0], 
@@ -70,3 +71,22 @@ def get_transformation(center, max_distance, offsets, scale, angles):
     mat_transform = np.matmul( mat_translation, mat_transform)
 
     return mat_transform.reshape(1,16)
+
+def view(camera_pos, camera_front, camera_up):
+    pos = glm.vec3(camera_pos[0], camera_pos[1], camera_pos[2])
+    front = glm.vec3(camera_front[0], camera_front[1], camera_front[2])
+    up = glm.vec3(camera_up[0], camera_up[1], camera_up[2])
+    # cameraPos = glm.vec3(1,0,0)
+    # center = glm.vec3(0,0,0)
+    # cameraUp = glm.vec3(0,1,0)
+    
+    # mat_view = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
+    mat_view = glm.lookAt(pos, pos+front, up)
+    mat_view = np.array(mat_view).reshape(1,16)
+    return mat_view
+    
+
+def projection(fov, aspect, near, far):
+    mat_projection = glm.perspective(glm.radians(fov), aspect, near, far)
+    mat_projection = np.array(mat_projection)    
+    return mat_projection

@@ -4,40 +4,26 @@ from OpenGL.GL import *
 import window 
 import key_event 
 import program 
-import object 
 import texture 
 import transformation
+from ilumination import Ilumination
+import constants
+from void import Void
+from scenario import Scenario
 
-# Create program, window, and set key event.
-window = window.create(600, 600)
+window = window.create(constants.height, constants.width)
 glfw.set_key_callback(window, key_event.key_event)
+glfw.set_cursor_pos_callback(window, key_event.mouse_event)
+
 program = program.create()
 
-# Load objects.
-infos = 5*[object.Info()]
+ilum = Ilumination(program)
+void = Void(program, ilum, key_event)
+scenario = Scenario(program, ilum, key_event)
 
-infos[0] = object.load('models/tartaruga/tartaruga.obj')
-infos[0].primitive = 'quads'
-texture.load(0, 'models/tartaruga/tartaruga.jpg')
+void.load()
+scenario.load()
 
-infos[1] = object.load('models/casa/casa.obj')
-infos[1].primitive = 'triangles'
-texture.load(1, 'models/casa/casa.jpg')
-
-infos[2] = object.load('models/planta/planta.obj')
-infos[2].primitive = 'quads'
-texture.load(2, 'models/planta/planta.jpg')
-
-infos[3] = object.load('models/estatua/estatua.obj')
-infos[3].primitive = 'quads'
-texture.load(3, 'models/estatua/estatua.jpg')
-
-infos[4] = object.load('models/touro/touro.obj')
-infos[4].primitive = 'quads'
-texture.load(4, 'models/touro/touro.jpg')
-
-# Set up openGL.
-loc_transformation = glGetUniformLocation(program, "mat_transformation")
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_TEXTURE_2D)
 glfw.show_window(window)
@@ -51,75 +37,31 @@ while not glfw.window_should_close(window):
     glClearColor(1.0, 1.0, 1.0, 1.0)
 
     # Activate or deactivate texture.
-    if key_event.polygonal_mode==True:
-        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
-    if key_event.polygonal_mode==False:
-        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
+    if key_event.polygonal_mode==True: glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
+    else: glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
+    
+    ilum.activate_light1(key_event.light1)
+    ilum.activate_light2(key_event.light2)
+    ilum.set_position1(key_event.light1_pos)
+    ilum.set_position2(key_event.light2_pos)
 
     # Set texture filtering method.
     texture.set_parameters(key_event.object, key_event.gl_linear)
-
-    # Adapt transformation to key event.
-    key_event.check_transforamtion_paramenters()
-    mat_transform = transformation.get_transformation( infos[key_event.object].center, 
-                                                       infos[key_event.object].max_distance, 
-                                                       key_event.offsets, 
-                                                       key_event.scale, 
-                                                       key_event.angles)
-    glUniformMatrix4fv(loc_transformation, 1, GL_TRUE, mat_transform)
     
-    # Display current object.
-    object.draw(program, key_event.object, infos[key_event.object])   
+    # Set view and projection.
+    mat_view = transformation.view(key_event.camera_pos, key_event.camera_front, key_event.camera_up)
+    loc_view = glGetUniformLocation(program, "view")
+    glUniformMatrix4fv(loc_view, 1, GL_TRUE, mat_view)
+    mat_projection = transformation.projection(120, constants.aspect, 0.1, 10000)
+    loc_projection = glGetUniformLocation(program, "projection")
+    glUniformMatrix4fv(loc_projection, 1, GL_TRUE, mat_projection)
+
+    # Draw objects.
+    if(not key_event.open_world):
+        void.draw()
+    else:
+        scenario.draw()
 
     glfw.swap_buffers(window)
 
 glfw.terminate()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# centers[0] = [0, 0, 0]
-# max_distances[0] = 1
-# n_vertices[0] = 3
-
-# vertices = np.zeros(4, [("position", np.float32, 2)])
-# vertices['position'] = [
-#                             ( 0.0, 0.0), # vertice 0
-#                             ( 0.0, 0.5), # vertice 1
-#                             ( 0.5, 0.0), # vertice 2
-#                             ( 1.0, 1.0) # vertice 0
-#                         ]
-
-# buffer = glGenBuffers(1)
-
-# glBindBuffer(GL_ARRAY_BUFFER, buffer)
-# glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
-# stride = vertices.strides[0]
-# offset = ctypes.c_void_p(0)
-# loc_vertices = glGetAttribLocation(program, "position")
-# glEnableVertexAttribArray(loc_vertices)
-# glVertexAttribPointer(loc_vertices, 3, GL_FLOAT, False, stride, offset)

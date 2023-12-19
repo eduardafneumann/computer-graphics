@@ -3,3 +3,4 @@ pyopengl==3.1.7
 numpy==1.26.1
 glm==0.4.4
 pillow==10.1.0
+pyglm==2.7.1
