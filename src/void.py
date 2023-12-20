@@ -29,5 +29,6 @@ class Void:
         
         param = constants.void_ilum_paramenters
         self.ilum.set_parameters(param[0], param[1], param[2], param[3])
+        # self.ilum.set_position(self.key_event.light_pos)
         
         object.draw(self.program, self.key_event.object, self.infos[self.key_event.object])   

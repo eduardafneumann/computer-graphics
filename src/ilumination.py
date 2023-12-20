@@ -22,8 +22,12 @@ class Ilumination:
         loc_ns = glGetUniformLocation(self.program, "ns") 
         glUniform1f(loc_ns, ns) 
         
+    # def set_position(self, position):
+    #     loc_light_pos = glGetUniformLocation(self.program, "lightPos")
+    #     glUniform3f(loc_light_pos, position[0], position[1], position[2])
+    
     def set_position1(self, position):
-        loc_light_pos = glGetUniformLocation(self.program, "lightPos1")
+        loc_light_pos = glGetUniformLocation(self.program, "lightPos")
         glUniform3f(loc_light_pos, position[0], position[1], position[2])
         
     def set_position2(self, position):
@@ -43,4 +47,3 @@ class Ilumination:
             glUniform1f(loc_active, 1.0) 
         else:
             glUniform1f(loc_active, 0.0) 
-        

@@ -2,6 +2,37 @@ import numpy as np
 import math
 import glm
 
+def walk_turtle(delta):
+    mat_translation = np.array([    [1.0, 0.0, 0.0, delta], 
+                                    [0.0, 1.0, 0.0, 0.0], 
+                                    [0.0, 0.0, 1.0, delta], 
+                                    [0.0, 0.0, 0.0,  1.0]
+                               ], np.float32) 
+    return mat_translation
+
+def rotate_turtle(angle, radius):
+    cy = math.cos(angle)
+    sy = math.sin(angle)
+    mat_rotation_y = np.array([     [ cy,  0.0,  sy, 0.0], 
+                                    [0.0,  1.0, 0.0, 0.0], 
+                                    [-sy,  0.0,  cy, 0.0], 
+                                    [0.0,  0.0, 0.0, 1.0]
+                              ], np.float32)
+    
+    mat_translation = np.array([    [1.0, 0.0, 0.0, radius], 
+                                    [0.0, 1.0, 0.0, 0.0], 
+                                    [0.0, 0.0, 1.0, radius], 
+                                    [0.0, 0.0, 0.0,  1.0]
+                               ], np.float32) 
+    
+    # mat_translation2= np.array([    [1.0, 0.0, 0.0, -radius], 
+    #                                 [0.0, 1.0, 0.0, 0.0], 
+    #                                 [0.0, 0.0, 1.0, -radius], 
+    #                                 [0.0, 0.0, 0.0,  1.0]
+    #                            ], np.float32) 
+    
+    return np.matmul( mat_rotation_y, mat_translation)
+
 def model(center, max_distance, offsets, scale, angles):
 
     mat_transform  = np.array([     [1.0, 0.0, 0.0, 0.0], 
@@ -10,7 +41,7 @@ def model(center, max_distance, offsets, scale, angles):
                                     [0.0, 0.0, 0.0, 1.0]
                               ], np.float32)
 
-      # Center the object in window.
+    # Center the object in window.
     mat_center      = np.array([    [1.0, 0.0, 0.0, -center[0]], 
                                     [0.0, 1.0, 0.0, -center[1]], 
                                     [0.0, 0.0, 1.0, -center[2]], 
@@ -28,7 +59,7 @@ def model(center, max_distance, offsets, scale, angles):
 
     mat_translation = np.array([    [1.0, 0.0, 0.0, offsets[0]], 
                                     [0.0, 1.0, 0.0, offsets[1]], 
-                                    [0.0, 0.0, 1.0, 0.0], 
+                                    [0.0, 0.0, 1.0, offsets[2]], 
                                     [0.0, 0.0, 0.0,  1.0]
                                ], np.float32)   
 

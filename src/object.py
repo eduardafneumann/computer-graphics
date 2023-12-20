@@ -167,4 +167,5 @@ def draw(program, texture_idx, info):
     elif info.primitive == 'quads' :
         glDrawArrays(GL_QUADS, 0, info.n_vertices)
     else:
+        glDrawArrays(GL_LINE_LOOP, 0, info.n_vertices)
         print("Invalid primitive, the object is not being displayed.")
