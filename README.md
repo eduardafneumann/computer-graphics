@@ -1,4 +1,4 @@
-# computer-graphics
+# Computer Graphics
 
 ## Setting up
 To make a virtual enviroment and run the program:
@@ -39,4 +39,11 @@ R, F, T, G, Y, H to move the light source
 
 I, K to change ambient ilumination
 
+## Screenshots
+
+![1](./screenshots/1.png)
+![2](./screenshots/2.png)
+![3](./screenshots/3.png)
+![4](./screenshots/4.png)
+![5](./screenshots/5.png)
 
